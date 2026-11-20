@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Family Calendar</title>
+        <link rel="stylesheet" href="/style.css" />
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.22/index.global.min.js"></script>
+    </head>
+    <body>
+        <div class="status-group">
+            <div class="legend">
+                <div class="legend-item"><span class="dot" style="background:#2563eb;"</span> Google</div>
+                <div class="legend-item"><span class="dot" style="background:#f97316;"</span> Outlook</div>
+                <div class="legend-item"><span class="dot" style="background:#16a34a;"</span> Apple</div>
+            </div>
+
+            <div class="status-group">
+                <span id="last-updated">Syncing... </span>
+                <span id="live-clock"></span>
+            </div>
+
+            <div id="calendar"></div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const calendarEl = document.getElementById("calendar");
+                    const statusEl = document.getElementById("last-updated");
+                    const clockEl = document.getElementById("live-clock");
+
+                    function updateClock() {
+                        const now = new Date();
+                        clockEl.textContent = now.toLocaleTimeString([], {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                        });
+                    }
+
+                    updateClock();
+                    setInterval(updateClock, 15000);
+                    const calendar = new FullCalendar.Calendar(calendarEl, {
+                        initialView: "dayGridMonth",
+                        headerToolBar: {
+                            left: 'prev,next today',
+                            center: 'title',
+                            right: 'dayGridMonth,timeGridWeek,listWeek'
+                        },
+                        height: '100%',
+                        nowIndicator: true,
+                        events: async (fetchInfo, successCallback, failureCallback) => {
+                            try {
+                                const response = await fetch("/api/events");
+                                if (data.syncedAt) {
+                                    const synced = new Date(data.syncedAt);
+                                    statusEl.textContent = `Updated ${synced.toLocaleTimeString([], { 
+                                        hour: '2-digit', 
+                                        minute: '2-digit' 
+                                    })}`;
+                                }
+                                successCallback(data.events || []);
+                            } catch (error) {
+                                console.error("Error fetching events:", error);
+                                failureCallback(error);
+                                statusEl.textContent = "Error fetching events";
+                            }
+                        },
+                    });
+                    calendar.render();
+
+                    setInterval(() => {
+                        calendar.refetchEvents();
+                    }, 10 * 60 * 1000);
+                });
+            </script>
+        </div>
+    </body>
+</html>
