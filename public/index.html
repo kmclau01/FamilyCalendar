@@ -8,7 +8,7 @@
         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.22/index.global.min.js"></script>
     </head>
     <body>
-        <div class="status-group">
+        <div class="top-bar">
             <div class="legend">
                 <div class="legend-item"><span class="dot" style="background:#2563eb;"</span> Google</div>
                 <div class="legend-item"><span class="dot" style="background:#f97316;"</span> Outlook</div>
@@ -40,16 +40,17 @@
                     setInterval(updateClock, 15000);
                     const calendar = new FullCalendar.Calendar(calendarEl, {
                         initialView: "dayGridMonth",
-                        headerToolBar: {
+                        headerToolbar: {
                             left: 'prev,next today',
                             center: 'title',
                             right: 'dayGridMonth,timeGridWeek,listWeek'
                         },
-                        height: '100%',
+                        height: 'auto',
                         nowIndicator: true,
                         events: async (fetchInfo, successCallback, failureCallback) => {
                             try {
                                 const response = await fetch("/api/events");
+                                const data = await response.json();
                                 if (data.syncedAt) {
                                     const synced = new Date(data.syncedAt);
                                     statusEl.textContent = `Updated ${synced.toLocaleTimeString([], { 

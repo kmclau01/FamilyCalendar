@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const path = process.env.PORT || 3000;
+const path = require('path');
 const { getEvents } = require('./controllers/calendarController');
 
 const app = express();
